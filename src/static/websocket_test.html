@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+    <head>
+        <title>WebSocket Test</title>
+    </head>
+    <body>
+        <h1>WebSocket roomId Test</h1>
+        <div>
+            <!-- 用户名输入框 -->
+            User: <input id="user" placeholder="Enter username..." />
+        </div>
+        <div>
+            <!-- 房间ID输入框 -->
+            roomId: <input id="roomId" value="default" />
+            <!-- 连接按钮 -->
+            <button onclick="connect()">Connect</button>
+        </div>
+        <div
+            id="log"
+            style="
+                border: 1px solid #ccc;
+                padding: 10px;
+                height: 300px;
+                overflow-y: scroll;
+            "
+        ></div>
+        <!-- 消息输入框 -->
+        <input id="message" placeholder="Enter message..." />
+        <!-- 发送消息按钮 -->
+        <button onclick="sendMessage()">Send</button>
+        <!-- 订阅按钮 -->
+        <button onclick="subscribe()">Subscribe</button>
+        <!-- 取消订阅按钮 -->
+        <button onclick="unsubscribe()">Unsubscribe</button>
+        <script>
+            let ws;
+
+            // 连接到WebSocket服务器
+            function connect() {
+                const user = document.getElementById("user").value;
+                ws = new WebSocket(`ws://localhost:9000/web_socket/ws?token=securetoken`);
+                ws.onopen = () => {
+                    console.log("Connected to WebSocket");
+                    // 发送登录请求
+                    const roomId = document.getElementById("roomId").value;
+                    const loginData = JSON.stringify({ action: "login", user: user, roomId: roomId });
+                    ws.send(loginData);
+                };
+                ws.onmessage = (event) => {
+                    const log = document.getElementById("log");
+                    const message = document.createElement("div");
+                    message.textContent = event.data;
+                    log.appendChild(message);
+                };
+                ws.onclose = () => alert("Disconnected");
+                ws.onerror = (error) => {
+                    console.error("WebSocket error:", error);
+                };
+            }
+
+            // 发送消息到指定房间
+            function sendMessage() {
+                const roomId = document.getElementById("roomId").value;
+                const message = document.getElementById("message").value;
+                const messageData = JSON.stringify({ action: "message", roomId: roomId, content: message });
+                ws.send(messageData);
+            }
+
+            // 订阅指定房间
+            function subscribe() {
+                const roomId = document.getElementById("roomId").value;
+                const messageData = JSON.stringify({ action: "subscribe", roomId: roomId });
+                ws.send(messageData);
+            }
+
+            // 取消订阅指定房间
+            function unsubscribe() {
+                const roomId = document.getElementById("roomId").value;
+                const messageData = JSON.stringify({ action: "unsubscribe", roomId: roomId });
+                ws.send(messageData);
+            }
+        </script>
+    </body>
+</html>

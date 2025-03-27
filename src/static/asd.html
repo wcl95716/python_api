@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Text Highlighting in Editable Div</title>
+		<style>
+			.editable-div {
+				border: 1px solid #ccc;
+				padding: 10px;
+				min-height: 100px;
+				width: 300px;
+				margin-bottom: 10px;
+			}
+
+			.highlight {
+				color: red;
+				font-weight: bold;
+			}
+		</style>
+	</head>
+	<body>
+		<div
+			id="editable-div"
+			class="editable-div"
+			contenteditable="true"
+		></div>
+		<button id="highlight-button">高亮关键词</button>
+
+		<script>
+			document
+				.getElementById("highlight-button")
+				.addEventListener("click", function () {
+					const div = document.getElementById("editable-div");
+					let text = div.innerText;
+					const keywords = ["苹果", "香蕉"]; // 定义需要高亮的关键词
+
+					keywords.forEach((keyword) => {
+						const regex = new RegExp(`(${keyword})`, "gi");
+						text = text.replace(
+							regex,
+							`<span class="highlight">$1</span>`,
+						);
+					});
+
+					div.innerHTML = text;
+				});
+		</script>
+	</body>
+</html>
