@@ -137,7 +137,7 @@ def upload_img_file(img_path:str) -> None:
         print(f"Request failed with status code: {response.status_code}")
         return None
    
-def get_tasks(
+def tianyi_get_wx_tasks(
     vehicle_df: pd.DataFrame, organization_df: pd.DataFrame
     ) -> list[RobotTask]:
     log_processing = get_log_processing(vehicle_df, organization_df)

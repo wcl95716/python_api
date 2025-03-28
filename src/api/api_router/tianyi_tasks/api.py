@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException, UploadFile, File
 import pandas as pd
 from typing import List
 
+from models.wechat_robot_tasks.api.main_api2 import tianyi_get_wx_tasks
+
 router = APIRouter(
     prefix="/tianyitasks",
     tags=["tianyiapi"],
@@ -14,6 +16,8 @@ async def upload_excel(file1: UploadFile = File(...), file2: UploadFile = File(.
         df1 = pd.read_excel(file1.file)
         # 读取第二个 Excel 文件
         df2 = pd.read_excel(file2.file)
+        
+        tasks = tianyi_get_wx_tasks(df1, df2)
 
         # 示例：将两个文件的行数返回
         result = {
