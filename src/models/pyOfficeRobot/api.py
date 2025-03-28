@@ -5,7 +5,6 @@ from models.wechat_robot_tasks.types.robot_task_type import RobotTask
 
 
 def fix_task_content(task: RobotTask):
-    
     pass
 
 
