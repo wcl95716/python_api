@@ -69,3 +69,6 @@ data/
 *.json
 *.yaml
 *.yml
+
+
+main.spec

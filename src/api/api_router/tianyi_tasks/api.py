@@ -3,11 +3,11 @@ import pandas as pd
 from typing import List
 
 router = APIRouter(
-    prefix="/tianyi_tasks",
+    prefix="/tianyitasks",
     tags=["tianyiapi"],
 )
 
-@router.post("/upload-excel")
+@router.post("/uploadexcel")
 async def upload_excel(file1: UploadFile = File(...), file2: UploadFile = File(...)):
     try:
         # 读取第一个 Excel 文件
