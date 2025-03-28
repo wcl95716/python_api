@@ -71,4 +71,4 @@ data/
 *.yml
 
 
-main.spec
+!main.spec

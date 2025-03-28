@@ -9,27 +9,24 @@
 """
 
 from fastapi import APIRouter
-from api.core.schemas import ResponseModel
-import importlib
-from pathlib import Path
 
 # 创建主路由实例
-api_router = APIRouter(
-    prefix="/api",
-    # tags=["system"]
-)
+api_router = APIRouter()
 
-# 自动导入所有子路由
-current_dir = Path(__file__).parent
-for item in current_dir.iterdir():
-    if item.is_dir() and not item.name.startswith('__'):
-        try:
-            # 动态导入每个子目录中的 api 模块
-            module = importlib.import_module(f"api.api_router.{item.name}.api")
-            if hasattr(module, 'router'):
-                api_router.include_router(module.router)
-        except ImportError as e:
-            print(f"Warning: Could not import router from {item.name}: {e}")
-        except Exception as e:
-            print(f"Warning: Error processing {item.name}: {e}")
+# 导入路由模块
+from api.api_router.tianyi_tasks.api import router as tianyi_tasks_router
+from api.api_router.port_manager.api import router as port_manager_router
+from api.api_router.example.api import router as example_router
+from api.api_router.example2.api import router as example2_router
+
+# 注册路由
+api_router.include_router(tianyi_tasks_router)
+api_router.include_router(port_manager_router)
+api_router.include_router(example_router)
+api_router.include_router(example2_router)
+
+# api_router.include_router(tianyi_tasks_router, prefix="/tianyi-tasks", tags=["天翼任务"])
+# api_router.include_router(port_manager_router, prefix="/port-manager", tags=["端口管理"])
+# api_router.include_router(example_router, prefix="/example", tags=["示例1"])
+# api_router.include_router(example2_router, prefix="/example2", tags=["示例2"])
 
