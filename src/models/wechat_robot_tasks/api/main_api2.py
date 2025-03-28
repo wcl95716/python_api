@@ -107,11 +107,11 @@ def get_log_processing(vehicle_df:pd.DataFrame, organization_group_df:pd.DataFra
     return log_processing
     pass
 
-def get_tasks( vehicle_url, organization_group_url) -> list[RobotTask]:
-    log_processing = get_log_processing(vehicle_url, organization_group_url)
-    tasks = log_processing.get_all_robot_task_by_group_and_status()
-    return tasks
-    pass 
+# def get_tasks( vehicle_url, organization_group_url) -> list[RobotTask]:
+#     log_processing = get_log_processing(vehicle_url, organization_group_url)
+#     tasks = log_processing.get_all_robot_task_by_group_and_status()
+#     return tasks
+#     pass 
 
 def upload_img_file(img_path:str) -> None:
     url = 'http://47.116.201.99:8001/test/upload_file'
@@ -136,8 +136,15 @@ def upload_img_file(img_path:str) -> None:
     else:
         print(f"Request failed with status code: {response.status_code}")
         return None
-
-    
+   
+def get_tasks(
+    vehicle_df: pd.DataFrame, organization_df: pd.DataFrame
+    ) -> list[RobotTask]:
+    log_processing = get_log_processing(vehicle_df, organization_df)
+    tasks = log_processing.get_all_robot_task_by_group_and_status()
+    tasks.extend(log_processing.get_all_robot_task_by_group())
+    return tasks
+    pass
 
 if __name__=='__main__':
 
