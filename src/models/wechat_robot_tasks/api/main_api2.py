@@ -5,25 +5,22 @@ import time
 sys.path.append("./src")
 import requests
 
-from models.wechat_robot_online.types.robot_task_type import RobotTask
+from models.wechat_robot_tasks.types.robot_task_type import RobotTask
 
 
-from models.wechat_robot_online.types.log_processing_type import LogProcessing
+from models.wechat_robot_tasks.types.log_processing_type import LogProcessing
 from utils import local_logger
 from utils.table_image import create_table_image
 
 
 import pandas as pd
-from models.wechat_robot_online.types.organization_group_type import OrganizationGroup
-from models.wechat_robot_online.types.vehicle_type import Vehicle
+from models.wechat_robot_tasks.types.organization_group_type import OrganizationGroup
+from models.wechat_robot_tasks.types.vehicle_type import Vehicle
 
 from utils.download_file import download_excel_and_read
 
 
-def get_vehicles_from_url(excel_url:str) -> list[Vehicle]:
-    # 读取Excel文件
-    
-    df:pd.DataFrame = download_excel_and_read(excel_url)
+def get_vehicles_from_url(df:pd.DataFrame) -> list[Vehicle]:
     
     df['车牌号码'] = df['车牌号码'].fillna('').astype(str)
     df['车辆组织'] = df['车辆组织'].fillna('').astype(str)
@@ -79,10 +76,10 @@ def get_vehicles_from_url(excel_url:str) -> list[Vehicle]:
     return vehicles
 
 
-def get_organizationgroups_from_url(excel_url: str) -> list[OrganizationGroup]:
+def get_organizationgroups_from_url(df:pd.DataFrame) -> list[OrganizationGroup]:
 
     # 使用download_excel_and_read函数下载Excel文件并读取内容
-    df = download_excel_and_read(excel_url)
+    # df = download_excel_and_read(excel_url)
     
     if df is not None:
         # 创建一个空列表来存储OrganizationGroup对象
@@ -101,9 +98,10 @@ def get_organizationgroups_from_url(excel_url: str) -> list[OrganizationGroup]:
     else:
         return []
 
-def get_log_processing(vehicle_url, organization_group_url) -> LogProcessing:
-    vehicle_list = get_vehicles_from_url(vehicle_url)
-    org_group_list = get_organizationgroups_from_url(organization_group_url)
+def get_log_processing(vehicle_df:pd.DataFrame, organization_group_df:pd.DataFrame) -> LogProcessing:
+    
+    vehicle_list = get_vehicles_from_url(vehicle_df)
+    org_group_list = get_organizationgroups_from_url(organization_group_df)
     
     log_processing = LogProcessing(vehicle_list, org_group_list)
     return log_processing
@@ -143,18 +141,12 @@ def upload_img_file(img_path:str) -> None:
 
 if __name__=='__main__':
 
-    # 传入Excel文件路径，并获取OrganizationGroup对象列表
-    # vehicle_url= "http://127.0.0.1:8001/test/uploads/5d1cf85c71b94aa4bdac16393c986d55_12.6.xlsx"
-    # excel_file_path= "http://localhost:8001/test/uploads/757e28eb783e4f86af3e48bb2580c237_-12-6.xlsx"
-    
-    vehicle_url= "http://0.0.0.0:25432/FileStoreAPI/get_file_uu_id/10bc559c-8680-4ba2-815f-7fd1b0264359"
-    # a71a109e-bb4c-4efb-a8dc-d44f3a678ce4
-    excel_file_path= "http://0.0.0.0:25432/FileStoreAPI/get_file_uu_id/7e985b48-a5fe-49e1-b225-d68b3b769f54"
-
-
+    # data/7-9苏标监控日志.xlsx
+    vehicle_df = pd.read_excel('data/7-9苏标监控日志.xlsx')
+    rule_df = pd.read_excel('data/群规则-12-6.xlsx')
     # 获取分类后的数据
     # 创建LogProcessingType对象并进行分类
-    log_processing = get_log_processing(vehicle_url, excel_file_path)
+    log_processing = get_log_processing(vehicle_df, rule_df)
     
     tasks = log_processing.get_all_robot_task_by_group_and_status()
     tasks.extend(log_processing.get_all_robot_task_by_group())

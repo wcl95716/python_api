@@ -5,17 +5,17 @@ import time
 sys.path.append("./src")
 import requests
 
-from models.wechat_robot_online.types.robot_task_type import RobotTask
+from models.wechat_robot_tasks.types.robot_task_type import RobotTask
 
 
-from models.wechat_robot_online.types.log_processing_type import LogProcessing
+from models.wechat_robot_tasks.types.log_processing_type import LogProcessing
 from utils import local_logger
 from utils.table_image import create_table_image
 
 
 import pandas as pd
-from models.wechat_robot_online.types.organization_group_type import OrganizationGroup
-from models.wechat_robot_online.types.vehicle_type import Vehicle
+from models.wechat_robot_tasks.types.organization_group_type import OrganizationGroup
+from models.wechat_robot_tasks.types.vehicle_type import Vehicle
 
 from utils.download_file import download_excel_and_read
 

@@ -1,14 +1,14 @@
 import math
 import sys
 import pandas as pd
-from models.wechat_robot_online.types.robot_task_type import RobotTask, RobotTaskType
+from models.wechat_robot_tasks.types.robot_task_type import RobotTask, RobotTaskType
 from utils.table_image import create_table_image
 
 sys.path.append("./src")
 from utils import local_logger
 
-from models.wechat_robot_online.types.organization_group_type import OrganizationGroup
-from models.wechat_robot_online.types.vehicle_type import Vehicle
+from models.wechat_robot_tasks.types.organization_group_type import OrganizationGroup
+from models.wechat_robot_tasks.types.vehicle_type import Vehicle
 
 
 class LogProcessingFilesUrl:
