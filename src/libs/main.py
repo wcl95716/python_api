@@ -143,31 +143,89 @@ class WeChatAutomation:
             return True
         return False
     
-    def send_message(self, message: str) -> bool:
-        """发送消息"""
-        if self.current_state == WeChatState.CHATTING:
-            # 输入消息
-            self._type_text(message)
-            # 按回车发送
-            self._press_enter()
-            return True
-        return False
-    
-    def send_file(self, file_path: str) -> bool:
-        """发送文件"""
-        if self.current_state == WeChatState.CHATTING:
-            # 将文件复制到剪贴板
-            if not self._copy_file_to_clipboard(file_path):
+    def send_message(self, user: str, message: str) -> bool:
+        """发送消息
+        Args:
+            user: 接收消息的用户或群组名称
+            message: 要发送的消息内容
+        """
+        print(f"开始发送消息给 {user}...")
+        print(f"当前状态: {self.current_state}")
+        
+        # 确保微信已打开
+        if self.current_state == WeChatState.CLOSED:
+            if not self.open_wechat():
+                print("打开微信失败")
                 return False
+            time.sleep(1)  # 等待微信启动
+        
+        # 如果当前在聊天状态，先退出
+        if self.current_state == WeChatState.CHATTING:
+            print("退出当前聊天...")
+            self._press_esc()
+            time.sleep(0.5)
+            self.current_state = WeChatState.OPENED
+        
+        # 先搜索用户
+        print(f"搜索用户 {user}...")
+        if not self.search(user):
+            print(f"搜索用户 {user} 失败")
+            return False
             
-            # 粘贴文件
-            self._press_cmd_v()
-            time.sleep(1)  # 增加等待时间，确保文件粘贴完成
+        print("搜索成功，准备发送消息...")
+        # 发送消息
+        self._type_text(message)
+        self._press_enter()
+        print("消息发送完成")
+        return True
+    
+    def send_file(self, user: str, file_path: str) -> bool:
+        """发送文件
+        Args:
+            user: 接收文件的用户或群组名称
+            file_path: 要发送的文件路径
+        """
+        print(f"开始发送文件给 {user}...")
+        print(f"当前状态: {self.current_state}")
+        
+        # 确保微信已打开
+        if self.current_state == WeChatState.CLOSED:
+            if not self.open_wechat():
+                print("打开微信失败")
+                return False
+            time.sleep(1)  # 等待微信启动
+        
+        # 如果当前在聊天状态，先退出
+        if self.current_state == WeChatState.CHATTING:
+            print("退出当前聊天...")
+            self._press_esc()
+            time.sleep(0.5)
+            self.current_state = WeChatState.OPENED
+        
+        # 先搜索用户
+        print(f"搜索用户 {user}...")
+        if not self.search(user):
+            print(f"搜索用户 {user} 失败")
+            return False
             
-            # 按回车发送
-            self._press_enter()
-            return True
-        return False
+        print("搜索成功，准备发送文件...")
+        
+        # 将文件复制到剪贴板
+        print(f"复制文件到剪贴板: {file_path}")
+        if not self._copy_file_to_clipboard(file_path):
+            print("复制文件到剪贴板失败")
+            return False
+        
+        print("文件已复制到剪贴板，准备粘贴...")
+        # 粘贴文件
+        self._press_cmd_v()
+        time.sleep(1)  # 增加等待时间，确保文件粘贴完成
+        
+        print("文件已粘贴，准备发送...")
+        # 按回车发送
+        self._press_enter()
+        print("文件发送完成")
+        return True
     
     def get_current_state(self) -> WeChatState:
         """获取当前状态"""
@@ -181,32 +239,20 @@ def main():
     # 测试状态机
     wechat = WeChatAutomation()
     
-    # 测试打开微信
-    print("尝试打开微信...")
-    if wechat.open_wechat():
-        print(f"微信已打开，当前状态: {wechat.get_current_state()}")
-        
-        # 测试搜索功能
-        print("尝试搜索...")
-        if wechat.search("文件传输助手"):
-            print(f"搜索完成，当前状态: {wechat.get_current_state()}")
-            
-            # 发送消息
-            print("尝试发送消息...")
-            if wechat.send_message("这是一条测试消息"):
-                print("消息发送成功")
-            else:
-                print("消息发送失败")
-                
-            # 发送文件
-            print("尝试发送文件...")
-            file_path = "/Users/panda/Documents/code/python_api/data/pngs/f395a87ff22a4a6db5d0fc1156375fe3.png"
-            if wechat.send_file(file_path):
-                print("文件发送成功")
-            else:
-                print("文件发送失败")
+    # 发送消息
+    print("尝试发送消息...")
+    if wechat.send_message("文件传输助手", "这是一条测试消息"):
+        print("消息发送成功")
     else:
-        print("操作失败")
+        print("消息发送失败")
+        
+    # 发送文件
+    print("尝试发送文件...")
+    file_path = "/Users/panda/Documents/code/python_api/data/pngs/f395a87ff22a4a6db5d0fc1156375fe3.png"
+    if wechat.send_file("文件传输助手", file_path):
+        print("文件发送成功")
+    else:
+        print("文件发送失败")
 
 if __name__ == "__main__":
     main()
