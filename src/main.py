@@ -4,19 +4,19 @@ from api import create_app
 import os
 import sys
 
+# 创建 FastAPI 应用实例
+app = create_app()
+
 def main():
     """主函数"""
     try:
-        # 创建 FastAPI 应用实例
-        app = create_app()
-        
         # 启动服务器
         uvicorn.run(
-            app,
+            app,  # 直接使用 app 实例
             host="0.0.0.0",
-            port=8000,
-            workers=10,
-            log_level="info"
+            port=8001,
+            log_level="info",
+            reload=False  # 在生产环境中禁用重载
         )
     except Exception as e:
         print(f"Error starting application: {e}")

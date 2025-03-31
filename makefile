@@ -1,4 +1,3 @@
-
 run:
 	uvicorn app:app --host 0.0.0.0 --port 9000
 
@@ -29,3 +28,9 @@ squash:
 	echo "3. 创建新的合并 commit..." && \
 	git commit -m "合并所有 commit" && \
 	echo "合并完成！"
+
+# 打包命令 pyinstaller
+build2:
+	rm -rf build/ dist/ *.spec
+	pyinstaller --onefile src/main.py
+	@echo "构建完成!"
