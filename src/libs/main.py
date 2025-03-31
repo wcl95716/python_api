@@ -20,6 +20,8 @@ class WeChatAutomation:
         self.current_state = WeChatState.CLOSED
         self.system = platform.system().lower()
         self.keyboard = Controller()
+        # 根据系统设置快捷键
+        self.cmd_key = Key.cmd if self.system == 'darwin' else Key.ctrl
     
     def _execute_command(self, command: list, shell: bool = False) -> bool:
         """执行系统命令"""
@@ -42,6 +44,20 @@ class WeChatAutomation:
         self.keyboard.release(Key.enter)
         time.sleep(0.5)  # 等待操作完成
     
+    def _press_cmd_f(self):
+        """按 Command+F (macOS) 或 Ctrl+F (Windows)"""
+        self.keyboard.press(self.cmd_key)
+        self.keyboard.press('f')
+        self.keyboard.release('f')
+        self.keyboard.release(self.cmd_key)
+        time.sleep(0.5)
+    
+    def _press_esc(self):
+        """按 ESC 键"""
+        self.keyboard.press(Key.esc)
+        self.keyboard.release(Key.esc)
+        time.sleep(0.3)
+    
     def open_wechat(self) -> bool:
         """打开微信"""
         if self.current_state == WeChatState.CLOSED:
@@ -63,16 +79,7 @@ class WeChatAutomation:
         """搜索聊天 并打开聊天框"""
         if self.current_state == WeChatState.OPENED:
             # 发送 Command+F (macOS) 或 Ctrl+F (Windows)
-            if self.system == 'darwin':
-                self.keyboard.press(Key.cmd)
-                self.keyboard.press('f')
-                self.keyboard.release('f')
-                self.keyboard.release(Key.cmd)
-            else:
-                self.keyboard.press(Key.ctrl)
-                self.keyboard.press('f')
-                self.keyboard.release('f')
-                self.keyboard.release(Key.ctrl)
+            self._press_cmd_f()
             
             time.sleep(0.5)  # 等待搜索框出现
             self.current_state = WeChatState.SEARCHING
@@ -88,24 +95,13 @@ class WeChatAutomation:
             # 第二次按回车选择第一个聊天框
             self._press_enter()
             self.current_state = WeChatState.CHATTING
-            
+
+            # 为了重新获取输入框焦点
             # 发送 Command+F (macOS) 或 Ctrl+F (Windows)
-            if self.system == 'darwin':
-                self.keyboard.press(Key.cmd)
-                self.keyboard.press('f')
-                self.keyboard.release('f')
-                self.keyboard.release(Key.cmd)
-                # esc
-                self.keyboard.press(Key.esc)
-                self.keyboard.release(Key.esc)
-            else:
-                self.keyboard.press(Key.ctrl)
-                self.keyboard.press('f')
-                self.keyboard.release('f')
-                self.keyboard.release(Key.ctrl)
-                # esc
-                self.keyboard.press(Key.esc)
-                self.keyboard.release(Key.esc)
+            self._press_cmd_f()
+            # esc
+            self._press_esc()
+            
             return True
         return False
     
@@ -147,11 +143,9 @@ def main():
                 print("消息发送成功")
             else:
                 print("消息发送失败")
-            
     else:
         print("操作失败")
 
 if __name__ == "__main__":
     main()
-    
     main()
