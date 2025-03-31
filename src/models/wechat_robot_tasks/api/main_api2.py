@@ -45,7 +45,7 @@ def get_vehicles_from_url(df:pd.DataFrame) -> list[Vehicle]:
         camera_status = row['摄像头状态']
         # row['服务到期时间']
         expiration_date = row['服务到期时间']
-        print("expiration_date: ", expiration_date)
+        # print("expiration_date: ", expiration_date)
         
         # print("status: ", status , isinstance(status, float))
         # 判断status 是否为浮点数
