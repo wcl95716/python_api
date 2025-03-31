@@ -58,6 +58,44 @@ class WeChatAutomation:
         self.keyboard.release(Key.esc)
         time.sleep(0.3)
     
+    def _press_cmd_v(self):
+        """按 Command+V (macOS) 或 Ctrl+V (Windows)"""
+        self.keyboard.press(self.cmd_key)
+        self.keyboard.press('v')
+        self.keyboard.release('v')
+        self.keyboard.release(self.cmd_key)
+        time.sleep(0.5)
+    
+    def _copy_file_to_clipboard(self, file_path: str) -> bool:
+        """将文件复制到剪贴板"""
+        if not os.path.exists(file_path):
+            print(f"文件不存在: {file_path}")
+            return False
+            
+        try:
+            if self.system == 'darwin':
+                # macOS 使用 osascript 来复制文件到剪贴板
+                script = f'''
+                tell application "System Events"
+                    set the clipboard to POSIX file "{file_path}"
+                end tell
+                '''
+                success = self._execute_command(['osascript', '-e', script])
+                if not success:
+                    print("复制文件到剪贴板失败")
+                    return False
+            elif self.system == 'windows':
+                # Windows 使用 clip
+                subprocess.run(['clip'], input=file_path.encode(), shell=True)
+            else:
+                print(f"不支持的操作系统: {self.system}")
+                return False
+            time.sleep(0.5)  # 等待剪贴板操作完成
+            return True
+        except Exception as e:
+            print(f"复制文件到剪贴板时出错: {str(e)}")
+            return False
+    
     def open_wechat(self) -> bool:
         """打开微信"""
         if self.current_state == WeChatState.CLOSED:
@@ -115,6 +153,22 @@ class WeChatAutomation:
             return True
         return False
     
+    def send_file(self, file_path: str) -> bool:
+        """发送文件"""
+        if self.current_state == WeChatState.CHATTING:
+            # 将文件复制到剪贴板
+            if not self._copy_file_to_clipboard(file_path):
+                return False
+            
+            # 粘贴文件
+            self._press_cmd_v()
+            time.sleep(1)  # 增加等待时间，确保文件粘贴完成
+            
+            # 按回车发送
+            self._press_enter()
+            return True
+        return False
+    
     def get_current_state(self) -> WeChatState:
         """获取当前状态"""
         return self.current_state
@@ -143,9 +197,16 @@ def main():
                 print("消息发送成功")
             else:
                 print("消息发送失败")
+                
+            # 发送文件
+            print("尝试发送文件...")
+            file_path = "/Users/panda/Documents/code/python_api/data/pngs/f395a87ff22a4a6db5d0fc1156375fe3.png"
+            if wechat.send_file(file_path):
+                print("文件发送成功")
+            else:
+                print("文件发送失败")
     else:
         print("操作失败")
 
 if __name__ == "__main__":
-    main()
     main()
