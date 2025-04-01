@@ -32,11 +32,59 @@ class WeChatAutomation:
             print(f"执行命令时出错: {str(e)}")
             return False
     
+    def _process_message(self, text: str) -> str:
+        """处理消息文本，将特殊标记转换为实际换行符
+        Args:
+            text: 原始消息文本
+        Returns:
+            处理后的文本
+        """
+        # 替换特殊标记为换行符
+        return text.replace("{ctrl}{ENTER}", "\n")
+    
     def _type_text(self, text: str):
         """使用 pynput 输入文本"""
         for char in text:
-            self.keyboard.type(char)
-            time.sleep(0.1)  # 添加延迟以确保输入稳定
+            if char == "\n":
+                # 根据操作系统选择换行快捷键
+                if self.system == 'darwin':
+                    # macOS 使用 Command+Enter
+                    self.keyboard.press(Key.cmd)
+                    self.keyboard.press(Key.enter)
+                    self.keyboard.release(Key.enter)
+                    self.keyboard.release(Key.cmd)
+                else:
+                    # Windows 使用 Ctrl+Enter
+                    self.keyboard.press(Key.ctrl)
+                    self.keyboard.press(Key.enter)
+                    self.keyboard.release(Key.enter)
+                    self.keyboard.release(Key.ctrl)
+                time.sleep(0.5)  # 等待换行完成
+            else:
+                self.keyboard.type(char)
+                time.sleep(0.1)  # 添加延迟以确保输入稳定
+    
+    def clear_message_list(self) -> bool:
+        """清空消息列表
+        Returns:
+            bool: 是否成功清空消息列表
+        """
+        # 全选消息列表
+        print("全选消息列表...")
+        self.keyboard.press(self.cmd_key)
+        self.keyboard.press('a')
+        self.keyboard.release('a')
+        self.keyboard.release(self.cmd_key)
+        time.sleep(0.5)
+        
+        # 删除选中的消息
+        print("删除选中的消息...")
+        self.keyboard.press(Key.delete)
+        self.keyboard.release(Key.delete)
+        time.sleep(0.5)
+        
+        print("消息列表清空完成")
+        return True
     
     def _press_enter(self):
         """按回车键"""
@@ -139,6 +187,8 @@ class WeChatAutomation:
             self._press_cmd_f()
             # esc
             self._press_esc()
+            # 清空消息列表
+            self.clear_message_list()
             
             return True
         return False
@@ -147,7 +197,7 @@ class WeChatAutomation:
         """发送消息
         Args:
             user: 接收消息的用户或群组名称
-            message: 要发送的消息内容
+            message: 要发送的消息内容，支持特殊换行符 {ctrl}{ENTER}
         """
         print(f"开始发送消息给 {user}...")
         print(f"当前状态: {self.current_state}")
@@ -173,9 +223,11 @@ class WeChatAutomation:
             return False
             
         print("搜索成功，准备发送消息...")
+        # 处理消息文本
+        processed_message = self._process_message(message)
         # 发送消息
-        self._type_text(message)
-        self._press_enter()
+        self._type_text(processed_message)
+        self._press_enter()  # 最后发送消息
         print("消息发送完成")
         return True
     

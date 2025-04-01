@@ -143,6 +143,11 @@ def tianyi_get_wx_tasks(
     log_processing = get_log_processing(vehicle_df, organization_df)
     tasks = log_processing.get_all_robot_task_by_group_and_status()
     tasks.extend(log_processing.get_all_robot_task_by_group())
+    # tasks 排序
+    
+    # 按照 to_user 字段进行排序，确保相同用户的任务被分组在一起
+    tasks.sort(key=lambda x: x.to_user)
+    # uiikprint("tasks: ", tasks)
     return tasks
     pass
 
@@ -155,8 +160,11 @@ if __name__=='__main__':
     # 创建LogProcessingType对象并进行分类
     log_processing = get_log_processing(vehicle_df, rule_df)
     
-    tasks = log_processing.get_all_robot_task_by_group_and_status()
-    tasks.extend(log_processing.get_all_robot_task_by_group())
+    # tasks = log_processing.get_all_robot_task_by_group_and_status()
+    # tasks.extend(log_processing.get_all_robot_task_by_group())
+    
+    tasks = tianyi_get_wx_tasks(vehicle_df, rule_df)
+   
     print(len(log_processing.vehicle_data_by_group.keys()) , len(tasks) )
     for task in tasks:
         print("task: ", task.task_type,task.to_user , task.content)
