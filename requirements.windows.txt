@@ -43,4 +43,4 @@ tzdata==2024.2
 urllib3==2.2.3
 uvicorn==0.32.0
 vtracer==0.6.11
-websockets==14.0
+websockets==14.0 
