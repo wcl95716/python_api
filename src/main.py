@@ -13,7 +13,7 @@ def main():
     try:
         # 创建命令行参数解析器
         parser = argparse.ArgumentParser(description='启动 FastAPI 服务器')
-        parser.add_argument('--port', type=int, default=8001, help='服务器端口号 (默认: 8001)')
+        parser.add_argument('--port', type=int, default=8066, help='服务器端口号 (默认: 8001)')
         args = parser.parse_args()
         
         print(f"服务器将在端口 {args.port} 上启动...")
