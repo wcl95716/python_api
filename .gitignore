@@ -71,3 +71,6 @@ data/
 *.yml
 
 main.spec
+
+# 允许 docker-compose.yml
+!docker-compose.yml

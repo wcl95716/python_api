@@ -1,0 +1,14 @@
+services:
+  python-api:
+    build: .
+    ports:
+      - "8066:8066"  # 主机端口:容器端口
+    volumes:
+      - ./src:/app/src  # 开发时方便修改代码
+      - ./data:/app/data  # 如果需要访问数据目录
+      - /tmp/.X11-unix:/tmp/.X11-unix  # X11 socket
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DISPLAY=host.docker.internal:0  # 修改 DISPLAY 环境变量
+      - XAUTHORITY=/tmp/.docker.xauth  # 添加 XAUTHORITY 环境变量
+    restart: unless-stopped 
