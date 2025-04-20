@@ -6,7 +6,9 @@ WORKDIR /app
 
 # 设置环境变量
 ENV PYTHONUNBUFFERED=1
-ENV DISPLAY=:0
+
+# 安装 netstat 工具
+RUN apt-get update && apt-get install -y net-tools && rm -rf /var/lib/apt/lists/*
 
 # 设置 pip 使用国内镜像源
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple

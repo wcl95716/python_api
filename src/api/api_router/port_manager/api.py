@@ -16,6 +16,8 @@ import time
 from typing import Optional, Dict, Tuple
 from dataclasses import dataclass
 from datetime import datetime
+import os
+import subprocess
 
 @dataclass(frozen=True)
 class PortInfo:
@@ -121,9 +123,21 @@ class PortManagerAPI(APIRouter):
         """
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.bind(('', port))
-                return True
-        except OSError:
+                s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                s.settimeout(0.1)
+                try:
+                    # 尝试连接到端口
+                    s.connect(('127.0.0.1', port))
+                    return False  # 如果能连接上，说明端口被占用
+                except (socket.timeout, ConnectionRefusedError):
+                    # 连接失败说明端口可能可用
+                    try:
+                        s.bind(('0.0.0.0', port))
+                        s.close()
+                        return True
+                    except OSError:
+                        return False
+        except Exception:
             return False
     
     def find_free_port(self, start_port: Optional[int] = None, max_port: Optional[int] = None) -> Optional[int]:
