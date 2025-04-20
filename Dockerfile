@@ -8,13 +8,13 @@ WORKDIR /app
 ENV PYTHONUNBUFFERED=1
 ENV DISPLAY=:0
 
-# 安装系统依赖
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    python3-dev \
-    xvfb \
-    x11-apps \
-    && rm -rf /var/lib/apt/lists/*
+# # 安装系统依赖
+# RUN apt-get update && apt-get install -y \
+#     build-essential \
+#     python3-dev \
+#     xvfb \
+#     x11-apps \
+#     && rm -rf /var/lib/apt/lists/*
 
 # 复制依赖文件
 COPY requirements.txt .
