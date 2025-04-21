@@ -132,11 +132,17 @@ class PortManagerAPI(APIRouter):
                 except (socket.timeout, ConnectionRefusedError):
                     # 连接失败说明端口可能可用
                     try:
+                        # 尝试绑定到所有接口
                         s.bind(('0.0.0.0', port))
                         s.close()
                         return True
                     except OSError:
-                        return False
+                        # 如果绑定失败，尝试使用 netstat 检查
+                        try:
+                            result = subprocess.run(['netstat', '-tuln'], capture_output=True, text=True)
+                            return str(port) not in result.stdout
+                        except Exception:
+                            return False
         except Exception:
             return False
     
